@@ -5,28 +5,101 @@ import { jsonError, readJsonBody, zodErrorResponse } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { publicUserSelect } from "@/lib/user-public";
 import { objectIdSchema } from "@/lib/validations/object-id";
-import { patchMeBodySchema, patchUserByIdBodySchema } from "@/lib/validations/user";
+import {
+  patchMeBodySchema,
+  patchUserByIdBodySchema,
+} from "@/lib/validations/user";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 /**
  * @openapi
  * /api/users/{id}:
+ *   parameters:
+ *     - in: path
+ *       name: id
+ *       required: true
+ *       schema:
+ *         type: string
+ *       description: User MongoDB ObjectId (24 hex chars)
  *   get:
  *     tags: [Users]
  *     summary: Get user by id (self or ADMIN)
  *     security:
  *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserEnvelope'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Not allowed to view this user
+ *       404:
+ *         description: User not found
  *   patch:
  *     tags: [Users]
  *     summary: ADMIN can update name, email, role. Users can update only their own name.
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               role:
+ *                 type: string
+ *                 enum: [USER, ADMIN]
+ *     responses:
+ *       200:
+ *         description: Updated user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserEnvelope'
+ *       400:
+ *         description: Validation error or no fields to update
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden for this user/id combination
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: Email already in use
  *   delete:
  *     tags: [Users]
  *     summary: Delete user (ADMIN only, not yourself)
  *     security:
  *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User deleted
+ *       400:
+ *         description: Cannot delete own account
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Not admin
+ *       404:
+ *         description: User not found
  */
 export async function GET(
   request: Request,

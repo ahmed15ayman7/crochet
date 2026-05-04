@@ -11,8 +11,29 @@ import { publicUserSelect } from "@/lib/user-public";
  *   get:
  *     tags: [Users]
  *     summary: List all users (ADMIN only)
+ *     description: Requires ADMIN Bearer JWT. Response body contains a users array (possibly empty).
  *     security:
  *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: OK — array of public user objects (no passwords)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UsersEnvelope'
+ *             examples:
+ *               sample:
+ *                 value:
+ *                   users:
+ *                     - id: "507f1f77bcf86cd799439011"
+ *                       name: "Ada"
+ *                       email: "ada@example.com"
+ *                       role: "ADMIN"
+ *                       createdAt: "2026-01-01T12:00:00.000Z"
+ *       401:
+ *         description: Missing or invalid Bearer token
+ *       403:
+ *         description: Authenticated but not ADMIN
  */
 export async function GET(request: Request) {
   const auth = await requireAuth(request);

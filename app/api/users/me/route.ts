@@ -14,11 +14,43 @@ import { patchMeBodySchema } from "@/lib/validations/user";
  *     summary: Current user profile
  *     security:
  *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserEnvelope'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User id from token not found
  *   patch:
  *     tags: [Users]
  *     summary: Update your display name
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *             description: At least one property required (currently only name).
+ *     responses:
+ *       200:
+ *         description: Updated profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserEnvelope'
+ *       400:
+ *         description: Validation error or no fields to update
+ *       401:
+ *         description: Unauthorized
  */
 export async function GET(request: Request) {
   const auth = await requireAuth(request);

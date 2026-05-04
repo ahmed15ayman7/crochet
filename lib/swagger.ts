@@ -23,6 +23,33 @@ export function buildOpenApiSpec(): object {
             description: "Paste the access token from /api/auth/login or /api/auth/register",
           },
         },
+        schemas: {
+          UserPublic: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "MongoDB ObjectId" },
+              name: { type: "string" },
+              email: { type: "string", format: "email" },
+              role: { type: "string", enum: ["USER", "ADMIN"] },
+              createdAt: { type: "string", format: "date-time" },
+            },
+          },
+          UserEnvelope: {
+            type: "object",
+            properties: {
+              user: { $ref: "#/components/schemas/UserPublic" },
+            },
+          },
+          UsersEnvelope: {
+            type: "object",
+            properties: {
+              users: {
+                type: "array",
+                items: { $ref: "#/components/schemas/UserPublic" },
+              },
+            },
+          },
+        },
       },
       security: [],
     },
