@@ -1,5 +1,8 @@
+import path from "node:path";
+
 import swaggerJSDoc from "swagger-jsdoc";
 
+/** Scans route files for `@openapi` JSDoc. Requires `.ts` files on disk (build/CI), not only Vercel serverless bundles. */
 export function buildOpenApiSpec(): object {
   return swaggerJSDoc({
     definition: {
@@ -23,6 +26,6 @@ export function buildOpenApiSpec(): object {
       },
       security: [],
     },
-    apis: ["./app/api/**/*.ts"],
+    apis: [path.join(process.cwd(), "app", "api", "**", "*.ts")],
   }) as object;
 }
